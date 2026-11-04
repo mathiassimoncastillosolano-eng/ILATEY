@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@theme{--color-ivory:#F6F2EA;--color-warm:#FCFAF7;--color-blush:#D9B7AC;--color-copper:#B98272;--color-nude:#E8D4CC;--color-brown:#72564D;--color-graphite:#302C2A;--font-serif:'Cormorant Garamond',Georgia,serif;--font-sans:'Manrope',system-ui,sans-serif}
+html{scroll-behavior:smooth;scroll-padding-top:80px}body{background:var(--color-ivory);color:var(--color-graphite);font-family:var(--font-sans);overflow-x:hidden}
+h1,h2,h3{font-family:var(--font-serif);font-weight:500;line-height:1.1}
+@layer components{.btn{@apply inline-block rounded-full bg-copper px-6 py-3 text-sm font-semibold text-white transition hover:-translate-y-0.5 hover:shadow-lg active:scale-95}.btn-o{@apply bg-transparent text-brown border border-blush}.eyebrow{@apply text-[.72rem] font-semibold uppercase tracking-[.22em] text-copper}.chip{@apply rounded-full border border-nude px-4 py-1.5 text-sm text-brown transition hover:border-copper}.chip-on{@apply bg-brown text-warm border-brown}}
