@@ -29,7 +29,7 @@ export function Flower({ t, x, y, r, c }: FlowerProps) {
     body = (
       <>
         {Array.from({ length: 14 }, (_, i) => (
-          <Petal key={i} a={i * 25.7} rx={r * 0.17} ry={r * 0.5} d={r * 0.62} c="#D9A93F" />
+          <Petal key={i} a={i * 25.7} rx={r * 0.17} ry={r * 0.5} d={r * 0.62} c="#E0B04A" />
         ))}
         <circle r={r * 0.5} fill="#72564D" />
       </>
@@ -40,7 +40,7 @@ export function Flower({ t, x, y, r, c }: FlowerProps) {
         {Array.from({ length: 10 }, (_, i) => (
           <Petal key={i} a={i * 36} rx={r * 0.2} ry={r * 0.46} d={r * 0.58} c="#FDFBF8" />
         ))}
-        <circle r={r * 0.28} fill="#D9A93F" />
+        <circle r={r * 0.28} fill="#E0B04A" />
       </>
     )
   }
