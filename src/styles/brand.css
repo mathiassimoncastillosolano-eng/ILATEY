@@ -1,0 +1,61 @@
+/* Identidad ILATEY Flower Studio: tokens evolucionados, logotipo, foco, botones y secciones nuevas */
+:root{
+  --sage:#8A9677;
+  --cop-text:#96604F;           /* cobre con contraste AA para texto pequeño */
+  --btn:#9E6757;                /* botón cobre con texto blanco (contraste ≥ 4.5) */
+  --logo:var(--cop);
+}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.eb,.cb b,.rl small,.fg h4,.fi h4,.od h5,.pt h5{color:var(--cop-text)}
+.qt .eb{color:var(--blush)!important}
+
+/* Foco visible en toda la app */
+a:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--cop-text);outline-offset:3px;border-radius:8px}
+.btn:focus-visible,.ic:focus-visible,.ch:focus-visible,.pill:focus-visible{border-radius:99px}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+.btn.ghost{color:var(--brown)}
+
+/* Logotipo y wordmark */
+.logo-copper{--logo:var(--cop)}
+.logo-light{--logo:#E8D4CC}
+.logo-sym{display:block;overflow:visible;flex:none}
+.brand{display:inline-flex;align-items:center;gap:12px}
+.brand-word{display:flex;flex-direction:column;line-height:1}
+.brand-name{font:500 25px/1 var(--serif);letter-spacing:.2em;margin-right:-.2em;color:var(--brown)}
+.brand-sub{font:600 8px/1 var(--sans);letter-spacing:.44em;margin-top:6px;color:var(--cop-text)}
+.logo-light .brand-name{color:var(--invt)}.logo-light .brand-sub{color:var(--blush)}
+.brand-link{display:inline-flex;transition:opacity .4s var(--ease)}.brand-link:hover{opacity:.82}
+.brand-link .logo-sym path{transition:stroke .4s}
+.brand-full{flex-direction:column;gap:16px;text-align:center}
+.brand-full .brand-word{align-items:center}.brand-full .brand-name{font-size:46px;font-weight:400}.brand-full .brand-sub{font-size:11px;margin-top:10px}
+.brand-footer{gap:16px}.brand-footer .brand-name{font-size:32px}.brand-footer .brand-sub{font-size:9.5px}
+.nv-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--cop);margin-left:6px;vertical-align:middle;transform:translateY(-6px)}
+.nb{gap:22px}
+.view{min-height:60vh}
+
+/* Navbar: con 6 enlaces el botón pasa a un segundo plano en pantallas medianas */
+@media(max-width:1100px){.nb>a.btn{display:none}.lk{gap:22px}}
+@media(max-width:860px){.brand-navbar .brand-name{font-size:22px}}
+
+/* Inicio */
+.hb{align-items:center}.hb .ul{padding-bottom:4px}
+.cz-promo{background:var(--bg2);padding:100px 0;overflow:hidden;border-block:1px solid var(--line)}
+.cz-promo-g{display:grid;grid-template-columns:1.05fr .95fr;gap:64px;align-items:center}
+.cz-promo h2{margin-bottom:16px}
+.cz-promo-t>p{color:var(--mut);max-width:480px;font-size:16px}
+.cz-promo-f{list-style:none;padding:0;display:grid;gap:12px;margin:26px 0 32px}
+.cz-promo-f li{display:flex;gap:12px;align-items:center;color:var(--brown);font-size:14px}.cz-promo-f svg{color:var(--cop);flex:none}
+.cz-promo-v{max-width:410px;width:100%;margin-inline:auto}
+.cz-promo-arch{border-radius:999px 999px 30px 30px;background:linear-gradient(180deg,var(--bg),var(--nude));box-shadow:var(--sh);overflow:hidden;padding:26px 14px 0;position:relative}
+.cz-promo-arch .cz-pv svg{background:none;border-radius:0}
+.cz-promo-cap{text-align:center;font-size:11px;color:var(--mut);margin-top:12px;letter-spacing:.04em}
+@media(max-width:860px){.cz-promo{padding:70px 0}.cz-promo-g{grid-template-columns:1fr;gap:40px}.cz-promo-v{max-width:320px}}
+
+/* Catálogo: invitación a personalizar */
+.cz-band{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:24px;flex-wrap:wrap;padding:32px 36px;border-radius:28px;background:var(--qt);color:var(--qtt);margin-top:10px}
+.cz-band h3{font-size:clamp(26px,3vw,38px);max-width:620px;margin:8px 0}.cz-band h3 em{color:var(--blush);font-weight:400}
+.cz-band .eb{color:var(--blush)}.cz-band p{opacity:.85;font-size:14px}
+.cz-band .btn{background:var(--bg);color:var(--brown)}
+
+.ph button.on{background:var(--btn)}
+.wl-skip:focus-visible{outline-offset:2px}

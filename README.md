@@ -1,53 +1,76 @@
-# ILATEY · Flores & Detalles
+# ILATEY Flower Studio
 
-Sitio web de ILATEY: flores artesanales. Pequeños detalles, grandes sentimientos.
+Sitio web de ILATEY Flower Studio: flores artesanales y un configurador para diseñar tu propio ramo.
 
 ## Stack
 
-React 19 · TypeScript · Vite 7 · Tailwind CSS v4 · React Router · Framer Motion · Zustand · Lucide · ESLint
+React 19 · TypeScript (strict) · Vite 7 · Tailwind CSS v4 · React Router 7 · Framer Motion · Zustand (persist) · Lucide · ESLint
 
 ## Cómo usarlo
 
 ```bash
 npm install
-npm run dev        # servidor de desarrollo
-npm run build      # compila para producción (carpeta dist/)
-npm run preview    # vista previa del build
-npm run lint       # revisión de código
+npm run lint
+npm run build        # incluye la comprobación de tipos (tsc -b)
+npm run dev          # servidor de desarrollo
+npm run preview      # vista previa del build
 ```
 
 Requiere Node 20.19 o superior.
+
+> **Estado de la verificación.** Este código se desarrolló sin acceso a la red, por lo que `npm install`, `lint` y `build` reales **no se ejecutaron**. Se comprobó la lógica con pruebas propias (precios, validación, geometría, modelo de vista previa) y un recorrido funcional con Playwright sobre un bundle de esbuild con *shims*. Ejecuta los comandos anteriores antes de publicar y revisa en especial las animaciones de Framer Motion (dibujo del logo, resortes de la vista previa).
 
 ## Estructura
 
 ```
 src/
-  data/products.ts      Ramos, ocasiones (MOODS), frases y vistas de galería
-  store/useStore.ts     Estado global (Zustand): favoritos, filtros, ramo abierto, aviso
-  lib/useGoSection.ts   Navegación suave a secciones
+  types/customization.ts        Tipos del configurador
+  data/
+    products.ts                 Catálogo, ocasiones (MOODS), frases
+    customizationOptions.ts     Flores, formas, paletas, papeles, cintas, tarjetas, pasos
+    pricingRules.ts             ÚNICA fuente de precios y límites (valores provisionales)
+  lib/
+    customizerValidation.ts     Validación por paso
+    bouquetLayout.ts, prng.ts   Geometría de la vista previa (con semilla)
+    previewModel.ts             Modelo de la vista previa
+    requestText.ts              Resumen de la solicitud en texto plano
+    requestChannel.ts           Capa de integración para enviar solicitudes
+    productSeed.ts, useCustomizer.ts, welcome.ts, usePageTitle.ts
+  store/
+    useStore.ts                 Favoritos, filtros, bienvenida
+    useCustomizerStore.ts       Configurador (persistido en este dispositivo)
   components/
-    Navbar, Footer, Toast
-    Bouquet.tsx         Ilustraciones referenciales de los ramos (SVG)
-    Carousel.tsx        Carrusel infinito, continuo y arrastrable
-    ProductModal.tsx    Ficha del ramo: galería, significado, ocasiones y relacionados
-    Reveal.tsx          Aparición suave al hacer scroll
-  pages/
-    Home.tsx            Inicio: resúmenes de colección y ocasiones
-    Catalog.tsx         Catálogo: búsqueda, filtros y todos los ramos
-    Occasions.tsx       Ocasiones: ideas y mensajes (sin ramos)
-  index.css             Diseño: paleta, modo oscuro, animaciones y Tailwind
+    branding/                   Logo SVG animado y variantes (full, symbol, navbar, footer)
+    welcome/                    Bienvenida de primera visita con pétalos
+    customizer/                 Configurador de 8 pasos, vista previa, resumen de precio
+  pages/                        Home, Catalog, Occasions, Customize (/personalizar)
+  styles/                       brand.css, customizer.css, welcome.css
+public/                         favicon.svg, logo-symbol.svg, apple-touch-icon.png
 ```
 
-## Dónde editar
+## Configurador de ramos
 
-- **Ramos, precios, textos:** `src/data/products.ts` → `products`
-- **Ocasiones (mensaje, paleta, detalle):** `src/data/products.ts` → `MOODS`
-- **Colores de marca:** `:root` en `src/index.css` y `@theme` (utilidades Tailwind como `text-brown`, `bg-ivory`)
-- **Instagram:** `src/components/Footer.tsx` (https://www.instagram.com/_ilatey_)
-- **Logo:** `public/logo.jpg`
+Ruta `/personalizar`, con accesos desde el menú, el inicio, el catálogo y la ficha de cada ramo. Ocho pasos: flores, cantidad, forma, colores, envoltorio, tarjeta, detalles extra y resumen. El diseño se guarda en el navegador. La vista previa es **ilustrativa** y así se rotula.
+
+### Precios (provisionales)
+
+Todo está en `src/data/pricingRules.ts`. Los precios por flor se derivaron del catálogo actual (precio ÷ flores) y **no son tarifas oficiales**. `null` significa «por cotizar» y `0` «incluido»; mientras haya conceptos por cotizar, el total se muestra como «Desde».
+
+ILATEY debe definir allí: precio por flor (peonía y complementos hoy por cotizar), suplementos de forma, papel, cinta, acabado, tarjeta y caja, y los límites (mínimo/máximo de flores, días de elaboración).
+
+### Solicitud de pedido
+
+El flujo distingue **configuración → solicitud preparada → pedido confirmado**. Hoy solo existe la solicitud preparada (local): se puede copiar o descargar como `.txt`. No se simula backend ni pagos, y no hay número de WhatsApp, correo ni API inventados. Para conectar un canal real, implementa `RequestChannel` y regístralo con `registerChannel` en `src/lib/requestChannel.ts`; el botón de envío del resumen aparecerá automáticamente.
+
+## Marca y bienvenida
+
+- Logo: `src/components/branding/` (`BrandLogo` con variantes). El tulipán se dibuja con `pathLength` y respeta `prefers-reduced-motion`.
+- Bienvenida: pantalla completa en la primera visita (`localStorage`, clave `ilatey-welcome-v1`), con «Omitir» y Esc; se puede ver de nuevo desde el pie de página.
+- Colores y tipografía: `src/styles/brand.css` y `:root` en `src/index.css`.
 
 ## Notas
 
-- Las imágenes de los ramos son ilustraciones referenciales (`Bouquet.tsx`). Para usar fotos reales, sustituye el componente `<Bouquet />` por `<img>` en `Carousel`, `Catalog` y `ProductModal`.
-- Para publicar en un hosting estático (Netlify, Vercel…) configura una regla de reescritura a `index.html` para que funcionen rutas como `/catalogo` al recargar.
-- Respeta `prefers-reduced-motion` y el modo claro/oscuro del sistema.
+- Las ilustraciones del catálogo son referenciales (`Bouquet.tsx`). Para usar fotos reales, sustituye `<Bouquet />`.
+- Hosting estático: `vercel.json` y `public/_redirects` reescriben a `index.html` para rutas como `/catalogo`.
+- Accesibilidad: foco visible, controles nativos, movimiento reducido y modo claro/oscuro del sistema.
+- Pendiente de decidir: el catálogo muestra «Ramo a tu Medida» con un precio de referencia, mientras el configurador calcula una estimación distinta.

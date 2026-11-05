@@ -4,18 +4,20 @@ import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { EASE, GALLERY_VIEWS, MOODS, PHRASES, products } from '../data/products'
 import type { Product } from '../data/products'
 import { useStore } from '../store/useStore'
+import { useOpenCustomizer } from '../lib/useCustomizer'
 import Bouquet from './Bouquet'
 
 function Modal({ p }: { p: Product }) {
-  const { close, favorites, toggleFav, notify, open } = useStore()
+  const { close, favorites, toggleFav, open } = useStore()
+  const customizer = useOpenCustomizer()
   const [vw, setVw] = useState(0)
-  const [ph, setPh] = useState(0)
+  const [ph, setPh] = useState<number | null>(null)
   const ps = useRef<HTMLDivElement>(null)
   const fav = favorites.includes(p.id)
   const n = GALLERY_VIEWS.length
 
   useEffect(() => {
-    setVw(0); setPh(0)
+    setVw(0); setPh(null)
     ps.current?.scrollTo({ top: 0 })
   }, [p.id])
 
@@ -71,14 +73,20 @@ function Modal({ p }: { p: Product }) {
                   <li key={a + b}><span>{a}</span>{b}</li>
                 ))}
               </ul>
-              <h5>Una frase para regalar</h5>
+              <h5>Una frase para tu tarjeta</h5>
               <div className="ph">
                 {PHRASES.map((f, i) => (
-                  <button key={f} className={i === ph ? 'on' : ''} onClick={() => setPh(i)}>“{f}”</button>
+                  <button key={f} className={i === ph ? 'on' : ''} aria-pressed={i === ph} onClick={() => setPh(i === ph ? null : i)}>“{f}”</button>
                 ))}
               </div>
+              <p className="nt" style={{ marginTop: 0, marginBottom: 14 }}>
+                {ph === null ? 'Elige una y la usaremos como dedicatoria al personalizar.' : 'Se usará como dedicatoria al personalizar tu ramo.'}
+                {p.flowers === 0 && ' El configurador calcula tu precio estimado según lo que elijas.'}
+              </p>
               <div className="flex flex-wrap gap-2.5">
-                <button className="btn" onClick={() => { close(); notify('¡Gracias! Tu detalle quedó anotado ♡') }}>Quiero regalar este ramo</button>
+                <button className="btn" onClick={() => { close(); customizer.fromProduct(p, ph === null ? undefined : PHRASES[ph]) }}>
+                  {p.flowers > 0 ? 'Personalizar este ramo' : 'Crear mi ramo'}
+                </button>
                 <button className="btn ghost" onClick={() => toggleFav(p.id)}>{fav ? '♥ En favoritos' : '♡ Guardar'}</button>
               </div>
             </div>

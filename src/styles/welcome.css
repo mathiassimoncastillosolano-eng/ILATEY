@@ -1,0 +1,38 @@
+/* Bienvenida de primera visita */
+.wl{position:fixed;inset:0;z-index:100;display:grid;place-items:center;overflow:hidden;color:var(--brown);--logo:#B98272}
+.wl-bg{position:absolute;inset:0;background:
+  radial-gradient(120% 90% at 50% 28%,#FCFAF7 0%,#F6F2EA 48%,#EBDCD3 100%)}
+.wl-glow{position:absolute;left:50%;top:44%;width:min(80vw,760px);aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(closest-side,rgba(217,183,172,.38),rgba(217,183,172,0));animation:wl-breathe 8s ease-in-out infinite}
+@keyframes wl-breathe{50%{transform:translate(-50%,-50%) scale(1.08);opacity:.8}}
+
+.wl-center{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px;min-height:340px;justify-content:center}
+.wl-name{display:flex;flex-direction:column;align-items:center;margin-top:18px;font-family:var(--serif);font-weight:400;line-height:1}
+.wl-letters{display:inline-flex;font-size:clamp(54px,11vw,118px);letter-spacing:.2em;margin-right:-.2em;color:var(--brown)}
+.wl-letters>span{display:inline-block;will-change:transform,opacity,filter}
+.wl-sub{font:600 clamp(10px,1.5vw,13px)/1 var(--sans);letter-spacing:.46em;margin-right:-.46em;margin-top:16px;color:var(--cop)}
+.wl-phrase{margin-top:34px;font:400 clamp(21px,3.4vw,32px)/1.35 var(--serif);color:var(--brown);max-width:520px}
+.wl-phrase em{color:var(--cop)}
+
+.wl-skip{position:absolute;z-index:3;top:calc(18px + env(safe-area-inset-top,0px));right:18px;display:inline-flex;align-items:center;gap:6px;
+  padding:9px 16px;border-radius:99px;font-size:12px;letter-spacing:.08em;color:var(--brown);opacity:.7;
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--blush) 80%,transparent);transition:opacity .3s,box-shadow .3s}
+.wl-skip:hover,.wl-skip:focus-visible{opacity:1;box-shadow:inset 0 0 0 1px var(--cop)}
+
+/* Pétalos */
+.wp-field{position:absolute;inset:0;z-index:1;perspective:900px;pointer-events:none;overflow:hidden}
+.wp{position:absolute;left:0;top:0;width:var(--w);height:calc(var(--w)*1.5);opacity:0;will-change:transform,opacity;
+  filter:blur(var(--blur));animation:wp-drift var(--dur) cubic-bezier(.36,.12,.34,.92) var(--delay) both}
+.wp-in{display:block;width:100%;height:100%;animation:wp-flutter var(--fl) ease-in-out infinite alternate}
+.wp svg{width:100%;height:100%;display:block;overflow:visible}
+.wp-edge{z-index:3}
+@keyframes wp-drift{
+  0%{opacity:0;transform:translate3d(var(--x0),-14vh,0) rotate(var(--r0))}
+  14%{opacity:var(--o)}
+  55%{transform:translate3d(var(--x1),52vh,0) rotate(var(--r1))}
+  86%{opacity:var(--o)}
+  100%{opacity:0;transform:translate3d(var(--x2),116vh,0) rotate(var(--r2))}
+}
+@keyframes wp-flutter{from{transform:rotateY(0) rotateX(0)}to{transform:rotateY(var(--ry)) rotateX(24deg)}}
+
+@media(prefers-reduced-motion:reduce){.wl-glow{animation:none!important}}

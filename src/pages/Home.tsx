@@ -5,13 +5,18 @@ import { useGoSection } from '../lib/useGoSection'
 import Bouquet from '../components/Bouquet'
 import Carousel from '../components/Carousel'
 import Reveal from '../components/Reveal'
+import CustomizerPromo from '../components/customizer/CustomizerPromo'
+import { useOpenCustomizer } from '../lib/useCustomizer'
+import { usePageTitle } from '../lib/usePageTitle'
 
 const RIBBON = 'Flores que no necesitan agua para seguir contando una historia'
 const RIBBON2 = 'Pequeños detalles, grandes sentimientos'
 
 export default function Home() {
+  usePageTitle()
   const navigate = useNavigate()
   const go = useGoSection()
+  const customizer = useOpenCustomizer()
   const reset = useStore((s) => s.reset)
   const ribbon = [RIBBON, RIBBON2, RIBBON, RIBBON2]
 
@@ -20,12 +25,13 @@ export default function Home() {
       <section className="hero">
         <div className="w hg">
           <div>
-            <Reveal as="span" className="eb">Flores artesanales · Hechas con amor</Reveal>
+            <Reveal as="span" className="eb">Flower Studio · Hecho a mano con amor</Reveal>
             <Reveal as="h1" delay={100}>Hay sentimientos que merecen <em>florecer.</em></Reveal>
             <Reveal as="p" className="l" delay={200}>Ramos creados pétalo a pétalo, para convertir pequeños detalles en recuerdos inolvidables.</Reveal>
             <Reveal className="hb" delay={300}>
-              <button className="btn" onClick={() => { reset(); navigate('/catalogo') }}>Descubrir nuestros ramos</button>
-              <button className="btn ghost" onClick={() => go('esencia')}>Nuestra esencia</button>
+              <button className="btn" onClick={customizer.create}>Crear mi ramo</button>
+              <button className="btn ghost" onClick={() => { reset(); navigate('/catalogo') }}>Descubrir nuestros ramos</button>
+              <button className="ul" onClick={() => go('esencia')}>Nuestra esencia →</button>
             </Reveal>
           </div>
           <Reveal className="art" delay={200}>
@@ -74,6 +80,8 @@ export default function Home() {
         </div>
         <Reveal delay={150}><Carousel /></Reveal>
       </section>
+
+      <CustomizerPromo />
 
       <section className="ess">
         <div className="w">

@@ -4,6 +4,8 @@ import { ChevronDown, Heart, Search, SlidersHorizontal, X } from 'lucide-react'
 import { EASE, MOODS, products } from '../data/products'
 import { useStore } from '../store/useStore'
 import Bouquet from '../components/Bouquet'
+import { useOpenCustomizer } from '../lib/useCustomizer'
+import { usePageTitle } from '../lib/usePageTitle'
 
 const cats = [...new Set(products.map((p) => p.cat))]
 const variants = {
@@ -13,6 +15,8 @@ const variants = {
 }
 
 export default function Catalog() {
+  usePageTitle('Catálogo')
+  const customizer = useOpenCustomizer()
   const { cat, mood, q, onlyFav, favorites, setCat, setMood, setQ, setOnlyFav, reset, open, toggleFav } = useStore()
   const [panel, setPanel] = useState(false)
   const active = (cat !== 'Todos' ? 1 : 0) + (mood !== 'Todos' ? 1 : 0) + (onlyFav ? 1 : 0)
@@ -105,9 +109,22 @@ export default function Catalog() {
           {list.length === 0 && (
             <div className="emp">
               <h3 style={{ fontSize: 28 }}>{onlyFav && favorites.length === 0 ? 'Aún no tienes favoritos' : 'No encontramos ramos con esta combinación'}</h3>
-              <p>Prueba con otro sentimiento o flor.</p>
-              <button className="btn mt-4" onClick={reset}>Limpiar filtros</button>
+              <p>Prueba con otro sentimiento o flor, o crea el ramo a tu manera.</p>
+              <div className="flex flex-wrap justify-center gap-2.5 mt-4">
+                <button className="btn" onClick={reset}>Limpiar filtros</button>
+                <button className="btn ghost" onClick={customizer.create}>Crear mi ramo</button>
+              </div>
             </div>
+          )}
+          {list.length > 0 && !onlyFav && (
+            <aside className="cz-band">
+              <div>
+                <span className="eb">Hecho a tu medida</span>
+                <h3>¿No es exactamente lo que imaginas? <em>Crea el tuyo.</em></h3>
+                <p>Elige flores, colores, envoltorio y dedicatoria, y mira cómo toma forma.</p>
+              </div>
+              <button className="btn" onClick={customizer.create}>Crear mi ramo</button>
+            </aside>
           )}
         </div>
       </div>

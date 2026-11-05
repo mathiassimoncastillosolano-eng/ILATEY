@@ -2,8 +2,10 @@ import { useNavigate } from 'react-router-dom'
 import { MOODS } from '../data/products'
 import { useStore } from '../store/useStore'
 import Reveal from '../components/Reveal'
+import { usePageTitle } from '../lib/usePageTitle'
 
 export default function Occasions() {
+  usePageTitle('Ocasiones')
   const navigate = useNavigate()
   const { reset, setMood } = useStore()
   const see = (id?: string) => {
