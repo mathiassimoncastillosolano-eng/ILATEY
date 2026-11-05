@@ -16,8 +16,6 @@
 
 /* Diseño global de ILATEY: tokens claro/oscuro, layout, componentes y animaciones */
 :root{color-scheme:light;--bg:#F6F2EA;--bg2:#FCFAF7;--card:#FCFAF7;--ink:#302C2A;--mut:#72564D;--brown:#72564D;--cop:#B98272;--blush:#D9B7AC;--nude:#E8D4CC;--line:#E8D4CC;--inv:#302C2A;--invt:#F6F2EA;--btn:#B98272;--btnt:#fff;--qt:#72564D;--qtt:#F6F2EA;--sh:0 24px 50px -28px rgba(114,86,77,.45);--ease:cubic-bezier(.22,.8,.24,1);--serif:'Cormorant Garamond',Georgia,serif;--sans:'DM Sans',system-ui,sans-serif;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#1F1A18;--bg2:#27201D;--card:#2B2421;--ink:#F3EBE4;--mut:#B6A59B;--brown:#E0C7BC;--cop:#D39A88;--blush:#6B4F46;--line:#3A302C;--inv:#F3EBE4;--invt:#1F1A18;--nude:#3A302C;--btn:#C98F7D;--btnt:#1F1A18;--qt:#4A3730;--qtt:#F3EBE4;--sh:0 24px 50px -28px rgba(0,0,0,.7)}}
-:root[data-theme="dark"]{color-scheme:dark;--bg:#1F1A18;--bg2:#27201D;--card:#2B2421;--ink:#F3EBE4;--mut:#B6A59B;--brown:#E0C7BC;--cop:#D39A88;--blush:#6B4F46;--line:#3A302C;--inv:#F3EBE4;--invt:#1F1A18;--nude:#3A302C;--btn:#C98F7D;--btnt:#1F1A18;--qt:#4A3730;--qtt:#F3EBE4;--sh:0 24px 50px -28px rgba(0,0,0,.7)}
 *{box-sizing:border-box;margin:0}html{scroll-behavior:smooth;scroll-padding-top:84px;height:100%}
 body{background:var(--bg);color:var(--ink);font:400 15px/1.7 var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}
 h1,h2,h3{font-family:var(--serif);font-weight:500;line-height:1.02;letter-spacing:-.02em}h2 em,h1 em{color:var(--cop);font-weight:400}
