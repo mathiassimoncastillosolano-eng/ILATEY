@@ -1,15 +1,108 @@
+import { useNavigate } from 'react-router-dom'
+import { MOODS, products } from '../data/products'
+import { useStore } from '../store/useStore'
+import { useGoSection } from '../lib/useGoSection'
 import Bouquet from '../components/Bouquet'
-import Catalog from '../components/Catalog'
-import Occasions from '../components/Occasions'
+import Carousel from '../components/Carousel'
 import Reveal from '../components/Reveal'
-import { useGoTo } from '../lib/nav'
-import { products } from '../data/products'
-export default function Home(){const go=useGoTo()
- return <><section id="inicio" className="px-5 pb-16 pt-10"><div className="mx-auto grid max-w-6xl items-center gap-10 md:grid-cols-[1.05fr_.95fr]">
- <Reveal className="order-2 md:order-1"><span className="eyebrow">Flores artesanales · Hechas con amor</span><h1 className="my-4 text-5xl md:text-7xl">Hay sentimientos que merecen <em className="text-copper">florecer.</em></h1><p className="max-w-lg text-brown">Ramos artesanales creados pétalo a pétalo, para convertir pequeños detalles en recuerdos inolvidables.</p><div className="mt-7 flex flex-wrap gap-3"><button className="btn" onClick={()=>go('catalogo')}>Descubrir nuestros ramos</button><button className="btn btn-o" onClick={()=>go('esencia')}>Conocer nuestra esencia</button></div></Reveal>
- <Reveal className="order-1 md:order-2"><div className="mx-auto aspect-square max-h-[440px] overflow-hidden rounded-t-[200px] rounded-b-3xl shadow-xl md:aspect-[4/5] md:max-h-none"><Bouquet p={products[0]}/></div></Reveal></div></section>
- <section id="esencia" className="bg-warm px-5 py-16 md:py-24"><div className="mx-auto grid max-w-6xl items-center gap-12 md:grid-cols-[.9fr_1.1fr]"><Reveal><div className="aspect-square overflow-hidden rounded-3xl border border-nude"><Bouquet p={products[1]} view={2}/></div></Reveal>
- <Reveal><span className="eyebrow">Nuestra esencia</span><h2 className="my-3 text-4xl md:text-5xl">No son solo flores. Son emociones hechas a mano.</h2><p className="text-brown">En ILATEY creemos que los pequeños detalles tienen el poder de convertirse en grandes recuerdos. Cada ramo es elaborado artesanalmente, cuidando cada forma, cada color y cada pequeño detalle.</p>
- <div className="mt-8 grid gap-4 md:grid-cols-3">{[['Hecho artesanalmente','Cada pétalo se dobla y se une a mano.'],['Diseñado para emocionar','Pensado para quien lo recibe.'],['Un detalle que permanece','No se marchita, se recuerda.']].map(([t,d])=><div key={t} className="border-t border-blush pt-3"><h3 className="text-xl text-brown">{t}</h3><p className="mt-1 text-xs">{d}</p></div>)}</div></Reveal></div></section>
- <Catalog/><Occasions/>
- <section className="bg-brown px-5 py-20 text-center text-ivory"><Reveal><span className="eyebrow !text-blush">Regalar es recordar</span><h2 className="mx-auto my-4 max-w-3xl text-4xl md:text-6xl">Hay regalos que se olvidan. Y hay <em className="text-blush">detalles que se quedan para siempre.</em></h2><p className="mx-auto max-w-xl font-serif text-2xl opacity-90">Una flor puede durar un instante en la memoria, pero el sentimiento con el que fue entregada puede quedarse para toda la vida.</p></Reveal></section></>}
+
+const RIBBON = 'Flores que no necesitan agua para seguir contando una historia'
+const RIBBON2 = 'Pequeños detalles, grandes sentimientos'
+
+export default function Home() {
+  const navigate = useNavigate()
+  const go = useGoSection()
+  const reset = useStore((s) => s.reset)
+  const ribbon = [RIBBON, RIBBON2, RIBBON, RIBBON2]
+
+  return (
+    <>
+      <section className="hero">
+        <div className="w hg">
+          <div>
+            <Reveal as="span" className="eb">Flores artesanales · Hechas con amor</Reveal>
+            <Reveal as="h1" delay={100}>Hay sentimientos que merecen <em>florecer.</em></Reveal>
+            <Reveal as="p" className="l" delay={200}>Ramos creados pétalo a pétalo, para convertir pequeños detalles en recuerdos inolvidables.</Reveal>
+            <Reveal className="hb" delay={300}>
+              <button className="btn" onClick={() => { reset(); navigate('/catalogo') }}>Descubrir nuestros ramos</button>
+              <button className="btn ghost" onClick={() => go('esencia')}>Nuestra esencia</button>
+            </Reveal>
+          </div>
+          <Reveal className="art" delay={200}>
+            <div className="ring" />
+            <div className="arch"><Bouquet p={products[0]} /></div>
+            <div className="stamp">HECHO<br />A MANO ✳</div>
+          </Reveal>
+        </div>
+      </section>
+
+      <div className="rb">
+        <div style={{ gap: 0 }}>
+          {ribbon.map((t, i) => (
+            <span key={i} style={{ color: 'inherit', display: 'inline-flex', gap: 48, paddingRight: 48 }}>
+              {t}<span>✳</span>
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <section className="ess" id="esencia">
+        <div className="w eg">
+          <Reveal className="ep"><Bouquet p={products[1]} view={2} /></Reveal>
+          <Reveal delay={150}>
+            <span className="eb">El corazón de ILATEY</span>
+            <h2>No son solo flores. Son emociones <em>hechas a mano.</em></h2>
+            <p style={{ color: 'var(--mut)' }}>Creemos que los pequeños detalles tienen el poder de convertirse en grandes recuerdos. Cada ramo se elabora artesanalmente, cuidando cada forma, cada color y cada detalle.</p>
+            <div className="vals">
+              <div><h3>Hecho artesanalmente</h3><p>Cada pétalo se moldea y se une a mano.</p></div>
+              <div><h3>Diseñado para emocionar</h3><p>Pensado para quien lo recibe.</p></div>
+              <div><h3>Un detalle que permanece</h3><p>No se marchita, se recuerda.</p></div>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <section style={{ paddingBottom: 70 }}>
+        <div className="w">
+          <Reveal className="sh">
+            <div>
+              <span className="eb">Nuestra colección</span>
+              <h2>Una flor para <em>cada forma de sentir.</em></h2>
+            </div>
+            <button className="ul" onClick={() => { reset(); navigate('/catalogo') }}>Ver todo el catálogo →</button>
+          </Reveal>
+        </div>
+        <Reveal delay={150}><Carousel /></Reveal>
+      </section>
+
+      <section className="ess">
+        <div className="w">
+          <Reveal className="sh">
+            <div>
+              <span className="eb">Ocasiones</span>
+              <h2>Cada momento merece <em>su propio detalle.</em></h2>
+            </div>
+            <button className="ul" onClick={() => navigate('/ocasiones')}>Explorar ocasiones →</button>
+          </Reveal>
+          <div className="oc">
+            {MOODS.slice(0, 3).map((m, i) => (
+              <Reveal as="button" className="o" delay={i * 80} key={m.id} onClick={() => navigate('/ocasiones')}>
+                <i className="bd">{m.glyph}</i>
+                <h3>{m.name}</h3>
+                <p>{m.desc}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="qt">
+        <div className="w">
+          <Reveal as="span" className="eb" style={{ color: 'var(--blush)' }}>Regalar es recordar</Reveal>
+          <Reveal as="h2">Hay regalos que se olvidan. Y hay <em>detalles que se quedan para siempre.</em></Reveal>
+          <Reveal as="p">Una flor puede durar un instante en la memoria, pero el sentimiento con el que fue entregada puede quedarse toda la vida.</Reveal>
+        </div>
+      </section>
+    </>
+  )
+}

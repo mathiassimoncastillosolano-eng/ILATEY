@@ -1,7 +1,35 @@
-import { useGoTo } from '../lib/nav'
-import { useStore } from '../store/useStore'
-export default function Footer(){const go=useGoTo();const n=useStore(s=>s.notify)
- return <footer id="contacto" className="border-t border-nude bg-warm px-5 pb-8 pt-14"><div className="mx-auto grid max-w-6xl gap-8 md:grid-cols-3"><div><img src="/logo.jpg" alt="ILATEY" className="h-28 w-28 rounded-full mix-blend-multiply"/><p className="font-serif text-xl text-brown">Flores &amp; Detalles</p><p className="text-sm">Pequeños detalles, grandes sentimientos.</p></div>
- <div className="flex flex-col items-start gap-2 text-sm text-brown"><span className="eyebrow">Navegar</span>{[['inicio','Inicio'],['esencia','Nuestra esencia'],['catalogo','Catálogo'],['ocasiones','Ocasiones']].map(([i,l])=><button key={i} onClick={()=>go(i)}>{l}</button>)}</div>
- <div className="flex flex-col items-start gap-2 text-sm text-brown"><span className="eyebrow">Contacto</span><button onClick={()=>n('Muy pronto: WhatsApp')}>WhatsApp</button><button onClick={()=>n('Muy pronto: Instagram')}>Instagram</button></div></div>
- <p className="mt-10 text-center font-serif text-2xl italic text-copper">Hecho a mano, pensado para el corazón.</p><p className="mt-2 text-center text-xs opacity-60">© 2026 ILATEY. Todos los derechos reservados.</p></footer>}
+import { Link } from 'react-router-dom'
+import { Instagram } from 'lucide-react'
+import { useGoSection } from '../lib/useGoSection'
+
+export default function Footer() {
+  const go = useGoSection()
+  return (
+    <footer id="contacto">
+      <div className="w fg">
+        <div>
+          <img src="/logo.jpg" alt="ILATEY" />
+          <p className="font-serif text-[22px] text-brown mt-2.5">Flores &amp; Detalles</p>
+          <p className="text-[13px]" style={{ color: 'var(--mut)' }}>Pequeños detalles, grandes sentimientos.</p>
+        </div>
+        <div>
+          <h4>Navegar</h4>
+          <a href="/#esencia" onClick={(e) => { e.preventDefault(); go('esencia') }}>Nuestra esencia</a>
+          <Link to="/catalogo">Catálogo</Link>
+          <Link to="/ocasiones">Ocasiones</Link>
+        </div>
+        <div>
+          <h4>Síguenos</h4>
+          <p className="text-[13px]" style={{ color: 'var(--mut)' }}>Novedades, procesos y nuevos ramos.</p>
+          <a className="ig" aria-label="Instagram de ILATEY" href="https://www.instagram.com/_ilatey_" target="_blank" rel="noopener noreferrer">
+            <Instagram size={24} strokeWidth={1.6} />
+          </a>
+        </div>
+      </div>
+      <p className="cp">
+        Hecho a mano, pensado para el corazón.
+        <small>© 2026 ILATEY · Todos los derechos reservados</small>
+      </p>
+    </footer>
+  )
+}

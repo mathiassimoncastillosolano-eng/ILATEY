@@ -1,3 +1,23 @@
-import { motion } from 'framer-motion'
-import type { ReactNode } from 'react'
-export default function Reveal({children,className}:{children:ReactNode;className?:string}){return <motion.div className={className} initial={{opacity:0,y:22}} whileInView={{opacity:1,y:0}} viewport={{once:true,amount:.15}} transition={{duration:.8,ease:'easeOut'}}>{children}</motion.div>}
+import { createElement, useRef } from 'react'
+import type { CSSProperties, MouseEventHandler, ReactNode } from 'react'
+import { useInView } from 'framer-motion'
+
+type Props = {
+  as?: 'div' | 'button' | 'article' | 'span' | 'h1' | 'h2' | 'p'
+  className?: string
+  delay?: number
+  style?: CSSProperties
+  onClick?: MouseEventHandler
+  children: ReactNode
+}
+
+/** Aparece suavemente al entrar en pantalla (usa useInView de Framer Motion + las clases .rv/.in del CSS). */
+export default function Reveal({ as = 'div', className = '', delay = 0, style, onClick, children }: Props) {
+  const ref = useRef<HTMLElement>(null)
+  const seen = useInView(ref, { once: true, amount: 0.12 })
+  return createElement(
+    as,
+    { ref, onClick, className: `rv ${seen ? 'in' : ''} ${className}`.trim(), style: { '--d': `${delay}ms`, ...style } as CSSProperties },
+    children,
+  )
+}

@@ -1,9 +1,33 @@
-import { Route, Routes } from 'react-router'
+import { useEffect } from 'react'
+import { Route, Routes, useLocation } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import Toast from './components/Toast'
+import ProductModal from './components/ProductModal'
 import Home from './pages/Home'
-import ProductDetail from './pages/ProductDetail'
-import { useStore } from './store/useStore'
-export default function App(){const toast=useStore(s=>s.toast)
- return <><Navbar/><main><Routes><Route path="/" element={<Home/>}/><Route path="/ramo/:slug" element={<ProductDetail/>}/><Route path="*" element={<Home/>}/></Routes></main><Footer/>
- <div aria-live="polite" className={`pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 rounded-full bg-graphite px-6 py-2.5 text-sm text-ivory transition ${toast?'opacity-100':'translate-y-4 opacity-0'}`}>{toast}</div></>}
+import Catalog from './pages/Catalog'
+import Occasions from './pages/Occasions'
+
+export default function App() {
+  const location = useLocation()
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }) }, [location.pathname])
+
+  return (
+    <>
+      <Navbar />
+      <main>
+        <div key={location.pathname} className="view ent">
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/catalogo" element={<Catalog />} />
+            <Route path="/ocasiones" element={<Occasions />} />
+            <Route path="*" element={<Home />} />
+          </Routes>
+        </div>
+      </main>
+      <Footer />
+      <ProductModal />
+      <Toast />
+    </>
+  )
+}
