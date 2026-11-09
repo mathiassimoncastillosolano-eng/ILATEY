@@ -76,13 +76,13 @@ function Ribbon({ w, color }: { w: Wrapping; color: string }) {
   )
 }
 
-type Props = { config: BouquetConfig; className?: string; caption?: boolean }
+type SvgProps = { config: BouquetConfig; /** Sin animaciones ni transformaciones CSS: el dibujo final, apto para convertir a imagen. */ still?: boolean }
 
 /**
- * Vista previa ilustrativa del ramo: SVG por capas (tallos → flores → papel → cinta → lazo → caja).
- * Responde a flores, cantidades, forma, colores y envoltorio. NO es fotorrealista y se rotula así.
+ * El dibujo del ramo (SVG por capas: tallos → flores → papel → cinta → lazo → caja).
+ * Se usa en la vista previa animada y, con `still`, como imagen del PDF de la solicitud.
  */
-export default function BouquetPreview({ config, className = '', caption = true }: Props) {
+export function BouquetSvg({ config, still = false }: SvgProps) {
   const reduce = useReducedMotion()
   const uid = useId().replace(/[^a-zA-Z0-9_-]/g, '')
   const model = useMemo(() => buildPreviewModel(config), [config])
@@ -97,34 +97,40 @@ export default function BouquetPreview({ config, className = '', caption = true 
     : `Vista ilustrativa de tu ramo: ${model.total} flores, forma ${shapeById(shape).name.toLowerCase()}`
 
   return (
-    <figure className={`cz-pv ${className}`.trim()}>
-      <svg viewBox="0 0 400 500" role="img" aria-label={label} focusable="false">
-        <defs>
-          <pattern id={`${uid}-dots`} width="9" height="9" patternUnits="userSpaceOnUse">
-            <circle cx="2.5" cy="2.5" r="1" fill={INK} fillOpacity={0.22} />
-          </pattern>
-        </defs>
-        <circle cx={200} cy={220} r={170} fill="#FDFBF8" opacity={0.55} />
-        <ellipse cx={200} cy={488} rx={96} ry={7} fill={INK} opacity={0.12} />
+    <svg viewBox="0 0 400 500" role="img" aria-label={label} focusable="false">
+      <defs>
+        <pattern id={`${uid}-dots`} width="9" height="9" patternUnits="userSpaceOnUse">
+          <circle cx="2.5" cy="2.5" r="1" fill={INK} fillOpacity={0.22} />
+        </pattern>
+      </defs>
+      <circle cx={200} cy={220} r={170} fill="#FDFBF8" opacity={0.55} />
+      <ellipse cx={200} cy={488} rx={96} ry={7} fill={INK} opacity={0.12} />
 
-        {/* Tallos y hojas */}
-        <g>
-          {leaves.map(([x, y, a], i) => (
-            <ellipse key={i} cx={x} cy={y} rx={11} ry={30} fill={SAGE} opacity={0.9} transform={`rotate(${a} ${x} ${y})`} />
-          ))}
-          {model.flowers.map((f) => (
-            <path key={f.key} d={`M${f.x.toFixed(1)} ${(f.y + f.r * 0.5).toFixed(1)} Q${((f.x + 200) / 2).toFixed(1)} 340 200 450`} stroke={SAGE} strokeWidth={4} fill="none" strokeLinecap="round" />
-          ))}
+      {/* Tallos y hojas */}
+      <g>
+        {leaves.map(([x, y, a], i) => (
+          <ellipse key={i} cx={x} cy={y} rx={11} ry={30} fill={SAGE} opacity={0.9} transform={`rotate(${a} ${x} ${y})`} />
+        ))}
+        {model.flowers.map((f) => (
+          <path key={f.key} d={`M${f.x.toFixed(1)} ${(f.y + f.r * 0.5).toFixed(1)} Q${((f.x + 200) / 2).toFixed(1)} 340 200 450`} stroke={SAGE} strokeWidth={4} fill="none" strokeLinecap="round" />
+        ))}
+      </g>
+
+      {/* Marcadores cuando aún no hay flores */}
+      {model.total === 0 && (
+        <g fill="none" stroke="#B98272" strokeOpacity={0.4} strokeDasharray="3 5" strokeWidth={1.4}>
+          {model.ghost.map((g, i) => <circle key={i} cx={g.x} cy={g.y} r={g.r} />)}
         </g>
+      )}
 
-        {/* Marcadores cuando aún no hay flores */}
-        {model.total === 0 && (
-          <g fill="none" stroke="#B98272" strokeOpacity={0.4} strokeDasharray="3 5" strokeWidth={1.4}>
-            {model.ghost.map((g, i) => <circle key={i} cx={g.x} cy={g.y} r={g.r} />)}
+      {/* Flores */}
+      {still ? (
+        model.flowers.map((f) => (
+          <g key={f.key} transform={`translate(${f.x} ${f.y}) rotate(${f.rot})`}>
+            <FlowerGlyph t={f.id} r={f.r} c={f.fill} />
           </g>
-        )}
-
-        {/* Flores */}
+        ))
+      ) : (
         <AnimatePresence initial={false}>
           {model.flowers.map((f) => (
             <motion.g
@@ -138,22 +144,37 @@ export default function BouquetPreview({ config, className = '', caption = true 
             </motion.g>
           ))}
         </AnimatePresence>
+      )}
 
-        {/* Envoltorio */}
-        {Array.from({ length: w.layers }, (_, i) => w.layers - 1 - i).map((k) => (
-          <Cone key={k} k={k} paper={w.paper} color={paperHex} uid={uid} />
-        ))}
-        <Ribbon w={w} color={ribbonHex} />
-        <Bow w={w} color={ribbonHex} />
+      {/* Envoltorio */}
+      {Array.from({ length: w.layers }, (_, i) => w.layers - 1 - i).map((k) => (
+        <Cone key={k} k={k} paper={w.paper} color={paperHex} uid={uid} />
+      ))}
+      <Ribbon w={w} color={ribbonHex} />
+      <Bow w={w} color={ribbonHex} />
 
-        {w.box && (
-          <g>
-            <rect x={92} y={376} width={216} height={110} rx={10} fill={mix(paperHex, INK, 0.38)} stroke={INK} strokeOpacity={0.3} />
-            <rect x={86} y={366} width={228} height={24} rx={8} fill={mix(paperHex, INK, 0.2)} stroke={INK} strokeOpacity={0.3} />
-            <rect x={190} y={366} width={20} height={120} fill={ribbonHex} fillOpacity={0.9} />
-          </g>
-        )}
-      </svg>
+      {w.box && (
+        <g>
+          <rect x={92} y={376} width={216} height={110} rx={10} fill={mix(paperHex, INK, 0.38)} stroke={INK} strokeOpacity={0.3} />
+          <rect x={86} y={366} width={228} height={24} rx={8} fill={mix(paperHex, INK, 0.2)} stroke={INK} strokeOpacity={0.3} />
+          <rect x={190} y={366} width={20} height={120} fill={ribbonHex} fillOpacity={0.9} />
+        </g>
+      )}
+    </svg>
+  )
+}
+
+type Props = { config: BouquetConfig; className?: string; caption?: boolean }
+
+/**
+ * Vista previa ilustrativa del ramo. Responde a flores, cantidades, forma, colores y envoltorio.
+ * NO es fotorrealista y se rotula así.
+ */
+export default function BouquetPreview({ config, className = '', caption = true }: Props) {
+  const model = useMemo(() => buildPreviewModel(config), [config])
+  return (
+    <figure className={`cz-pv ${className}`.trim()}>
+      <BouquetSvg config={config} />
       {caption && (
         <figcaption>
           <strong>Vista ilustrativa</strong> · no es una fotografía de tu ramo final.

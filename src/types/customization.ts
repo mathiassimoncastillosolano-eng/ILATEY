@@ -14,6 +14,12 @@ export type LayerCount = 1 | 2 | 3
 /** available: se vende hoy · consult: hay que confirmarlo con el taller · unavailable: no seleccionable */
 export type Availability = 'available' | 'consult' | 'unavailable'
 
+/** Cómo llegó el cliente al configurador. Solo decide el punto de partida; el diseño real vive en BouquetConfig. */
+export type EntryMode = 'scratch' | 'catalog-custom' | 'catalog-direct'
+
+/** Formato en que se presenta la solicitud al taller. */
+export type RequestFormat = 'pdf' | 'txt'
+
 export type StepId = 'flores' | 'cantidad' | 'forma' | 'colores' | 'envoltorio' | 'tarjeta' | 'detalles' | 'resumen'
 
 export interface Wrapping {
@@ -88,12 +94,20 @@ export interface Quote {
   provisional: boolean
 }
 
-/** Solicitud preparada: existe solo en este dispositivo hasta que se conecte un canal comercial. */
+/**
+ * Solicitud preparada: existe solo en este dispositivo. Es una FOTO de config + quote en el momento de prepararla
+ * (TXT y PDF salen de ella, así que siempre coinciden). Cualquier cambio de diseño la invalida.
+ *   prepared  → lista, aún sin contacto
+ *   contacted → el cliente abrió WhatsApp (no podemos saber si envió el mensaje)
+ *   sent      → un canal comercial confirmó el envío (ver lib/requestChannel.ts)
+ */
 export interface PurchaseRequest {
   id: string
   createdAt: string
   config: BouquetConfig
   quote: Quote
   text: string
-  status: 'prepared' | 'sent'
+  status: 'prepared' | 'contacted' | 'sent'
+  /** Formato con el que el cliente inició el contacto. */
+  format?: RequestFormat
 }

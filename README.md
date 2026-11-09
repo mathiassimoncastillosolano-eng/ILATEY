@@ -74,3 +74,17 @@ El flujo distingue **configuración → solicitud preparada → pedido confirmad
 - Hosting estático: `vercel.json` y `public/_redirects` reescriben a `index.html` para rutas como `/catalogo`.
 - Accesibilidad: foco visible, controles nativos, movimiento reducido y modo claro/oscuro del sistema.
 - Pendiente de decidir: el catálogo muestra «Ramo a tu Medida» con un precio de referencia, mientras el configurador calcula una estimación distinta.
+
+## Flujo de solicitud (catálogo → WhatsApp)
+
+- **Ficha de producto**: «Quiero este ramo» (principal, empieza en el paso 5 · Envoltorio), «Personalizar este ramo» (empieza en Flores) y «Guardar».
+- **Resumen**: el cliente elige PDF o TXT, se genera el documento y «Continuar por WhatsApp» lo descarga y abre `https://wa.me/51949265514` con el mensaje preparado. WhatsApp no permite adjuntar archivos desde un enlace: el cliente debe adjuntar el documento a mano (la interfaz lo indica).
+- **Una sola fuente de datos**: `src/lib/requestDocument.ts` (derivado de `BouquetConfig` + `Quote`) alimenta el resumen, el TXT (`requestText.ts`), el PDF (`lib/pdf/renderRequestPdf.ts`) y el mensaje (`whatsapp.ts`).
+- **PDF**: `pdf-lib` + `@pdf-lib/fontkit`, cargados solo al generar un PDF. Tipografías (Cormorant Garamond y DM Sans, licencia OFL) recortadas a Latin en `src/assets/pdf-fonts/`.
+
+### Pruebas E2E
+
+```bash
+npm run build && npx vite preview --port 4173 &
+python3 qa/e2e.py        # requiere `pip install playwright` y Chromium; capturas en /tmp/qa
+```

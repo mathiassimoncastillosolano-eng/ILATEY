@@ -1,11 +1,20 @@
 import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft, ChevronRight, X } from 'lucide-react'
+import { ArrowRight, ChevronLeft, ChevronRight, Flower2, Heart, X } from 'lucide-react'
 import { EASE, GALLERY_VIEWS, MOODS, PHRASES, products } from '../data/products'
 import type { Product } from '../data/products'
 import { useStore } from '../store/useStore'
 import { useOpenCustomizer } from '../lib/useCustomizer'
+import { canChooseDirectly } from '../lib/productSeed'
 import Bouquet from './Bouquet'
+
+function FavButton({ fav, onClick }: { fav: boolean; onClick: () => void }) {
+  return (
+    <button type="button" className={`pm-fav ${fav ? 'on' : ''}`} aria-pressed={fav} onClick={onClick}>
+      <Heart size={16} strokeWidth={1.7} aria-hidden="true" /> {fav ? 'En favoritos' : 'Guardar'}
+    </button>
+  )
+}
 
 function Modal({ p }: { p: Product }) {
   const { close, favorites, toggleFav, open } = useStore()
@@ -15,6 +24,8 @@ function Modal({ p }: { p: Product }) {
   const ps = useRef<HTMLDivElement>(null)
   const fav = favorites.includes(p.id)
   const n = GALLERY_VIEWS.length
+  const direct = canChooseDirectly(p)
+  const message = ph === null ? undefined : PHRASES[ph]
 
   useEffect(() => {
     setVw(0); setPh(null)
@@ -83,11 +94,30 @@ function Modal({ p }: { p: Product }) {
                 {ph === null ? 'Elige una y la usaremos como dedicatoria al personalizar.' : 'Se usará como dedicatoria al personalizar tu ramo.'}
                 {p.flowers === 0 && ' El configurador calcula tu precio estimado según lo que elijas.'}
               </p>
-              <div className="flex flex-wrap gap-2.5">
-                <button className="btn" onClick={() => { close(); customizer.fromProduct(p, ph === null ? undefined : PHRASES[ph]) }}>
-                  {p.flowers > 0 ? 'Personalizar este ramo' : 'Crear mi ramo'}
-                </button>
-                <button className="btn ghost" onClick={() => toggleFav(p.id)}>{fav ? '♥ En favoritos' : '♡ Guardar'}</button>
+              <div className="pm-actions">
+                {direct ? (
+                  <>
+                    <button type="button" className="btn pm-main" onClick={() => { close(); customizer.chooseProduct(p, message) }}>
+                      <Flower2 size={18} strokeWidth={1.7} aria-hidden="true" />
+                      <span>Quiero este ramo</span>
+                      <ArrowRight size={18} strokeWidth={1.7} className="pm-go" aria-hidden="true" />
+                    </button>
+                    <div className="pm-sub">
+                      <button type="button" className="btn ghost pm-second" onClick={() => { close(); customizer.fromProduct(p, message) }}>Personalizar este ramo</button>
+                      <FavButton fav={fav} onClick={() => toggleFav(p.id)} />
+                    </div>
+                    <p className="nt pm-hint">Con «Quiero este ramo» conservas sus flores tal como están y eliges envoltorio, tarjeta y fecha.</p>
+                  </>
+                ) : (
+                  <>
+                    <button type="button" className="btn pm-main" onClick={() => { close(); customizer.fromProduct(p, message) }}>
+                      <Flower2 size={18} strokeWidth={1.7} aria-hidden="true" />
+                      <span>Crear mi ramo</span>
+                      <ArrowRight size={18} strokeWidth={1.7} className="pm-go" aria-hidden="true" />
+                    </button>
+                    <div className="pm-sub"><FavButton fav={fav} onClick={() => toggleFav(p.id)} /></div>
+                  </>
+                )}
               </div>
             </div>
           </div>

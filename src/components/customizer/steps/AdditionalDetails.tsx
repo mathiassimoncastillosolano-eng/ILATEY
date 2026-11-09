@@ -1,6 +1,7 @@
 import { LIMITS } from '../../../data/pricingRules'
 import { formatDate, minDeliveryDate, validateStep } from '../../../lib/customizerValidation'
 import { useCustomizerStore } from '../../../store/useCustomizerStore'
+import DatePicker from '../ui/DatePicker'
 import Msg from '../ui/Msg'
 
 export default function AdditionalDetails() {
@@ -36,8 +37,8 @@ export default function AdditionalDetails() {
         </div>
         <div className="cz-field">
           <label htmlFor="cz-date">Fecha deseada de entrega <small>opcional</small></label>
-          <input id="cz-date" type="date" min={min} value={x.deliveryDate} onChange={(e) => set({ deliveryDate: e.target.value })} />
-          <small className="cz-hint">Desde el {formatDate(min)}. Sujeta a confirmación del taller.</small>
+          <DatePicker id="cz-date" value={x.deliveryDate} min={min} onChange={(deliveryDate) => set({ deliveryDate })} describedBy="cz-date-hint" />
+          <small id="cz-date-hint" className="cz-hint">Desde el {formatDate(min)}. Sujeta a confirmación del taller.</small>
         </div>
       </div>
       {errors.map((e) => <Msg key={e} kind="error">{e}</Msg>)}

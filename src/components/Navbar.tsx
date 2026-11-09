@@ -44,17 +44,18 @@ export default function Navbar() {
             <a href="/#esencia" onClick={section('esencia')}>Esencia</a>
             <NavLink to="/catalogo" className={link}>Catálogo</NavLink>
             <NavLink to="/ocasiones" className={link}>Ocasiones</NavLink>
-            <NavLink to="/personalizar" className={link}>
-              Personalizar
-              {hasDraft && <><i className="nv-dot" aria-hidden="true" /><span className="sr-only"> (tienes un diseño guardado)</span></>}
-            </NavLink>
             <a href="/#contacto" onClick={section('contacto')}>Contacto</a>
+            {/* Solo en el menú móvil: ahí el botón principal de la barra está oculto */}
+            <NavLink to="/personalizar" className="btn lk-cta">Crear mi ramo</NavLink>
           </div>
           <button className={`ic ${onlyFav ? 'on' : ''}`} id="fv" aria-label="Favoritos" onClick={openFavs}>
             <Heart size={18} strokeWidth={1.6} />
             {favorites.length > 0 && <b>{favorites.length}</b>}
           </button>
-          <NavLink className="btn" to="/personalizar">Crear mi ramo</NavLink>
+          <NavLink className="btn" to="/personalizar">
+            Crear mi ramo
+            {hasDraft && <><i className="nv-dot" aria-hidden="true" /><span className="sr-only"> (tienes un diseño guardado)</span></>}
+          </NavLink>
           <button className="ic" id="bm" aria-label="Menú" onClick={() => setMenu(!menu)}>
             {menu ? <X size={18} strokeWidth={1.6} /> : <Menu size={18} strokeWidth={1.6} />}
           </button>

@@ -6,6 +6,7 @@ import './index.css'
 import './styles/brand.css'
 import './styles/customizer.css'
 import './styles/welcome.css'
+import './styles/contact.css'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

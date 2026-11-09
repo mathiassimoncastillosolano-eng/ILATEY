@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { STEPS } from '../../data/customizationOptions'
 import { EASE, products } from '../../data/products'
+import { bouquetOrigin } from '../../lib/bouquetOrigin'
 import { firstInvalidStep, validateStep } from '../../lib/customizerValidation'
 import { usePageTitle } from '../../lib/usePageTitle'
 import { useCustomizerStore } from '../../store/useCustomizerStore'
@@ -39,6 +40,7 @@ export default function BouquetCustomizer() {
   const config = useCustomizerStore((s) => s.config)
   const storedStep = useCustomizerStore((s) => s.step)
   const previous = useCustomizerStore((s) => s.previous)
+  const entry = useCustomizerStore((s) => s.entry)
   const setStep = useCustomizerStore((s) => s.setStep)
   const reset = useCustomizerStore((s) => s.reset)
   const restorePrevious = useCustomizerStore((s) => s.restorePrevious)
@@ -55,6 +57,8 @@ export default function BouquetCustomizer() {
   const step = Math.min(storedStep, maxStep)
   const errors = validateStep(STEPS[step].id, config)
   const missing = STEPS.slice(0, last).filter((s) => validateStep(s.id, config).length > 0).map((s) => s.label)
+  const origin = bouquetOrigin(config)
+  const direct = entry === 'catalog-direct' && origin.kind === 'catalog' ? origin.product : null
   const baseName = previous && config.baseProductId ? products.find((p) => p.id === config.baseProductId)?.name : null
 
   const go = (n: number) => {
@@ -89,6 +93,13 @@ export default function BouquetCustomizer() {
               {' · '}
               <button type="button" className="cz-link" onClick={dismissPrevious}>Descartarlo</button>
             </span>
+          </div>
+        )}
+
+        {direct && (
+          <div className="cz-direct" role="status">
+            <span>Elegiste <b>{direct.name}</b> tal como es en el catálogo: sus flores, forma y colores ya están definidos.</span>
+            <button type="button" className="cz-link strong" onClick={() => go(0)}>Cambiar flores y colores</button>
           </div>
         )}
 

@@ -1,11 +1,11 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import type {
-  BouquetConfig, CardDraft, Extras, FlowerId, PaletteId, PurchaseRequest, ShapeId, Wrapping,
+  BouquetConfig, CardDraft, EntryMode, Extras, FlowerId, PaletteId, PurchaseRequest, RequestFormat, ShapeId, Wrapping,
 } from '../types/customization'
 import { FLOWERS, STEPS, flowerById } from '../data/customizationOptions'
 import { LIMITS, computeQuote, totalFlowers } from '../data/pricingRules'
-import { allowedPalettes } from '../lib/customizerValidation'
+import { allowedPalettes, firstInvalidStep } from '../lib/customizerValidation'
 import { formatRequestText } from '../lib/requestText'
 import { defaultConfig, isPristine, normalizeConfig } from './customizerDefaults'
 
@@ -23,6 +23,8 @@ interface CustomizerState {
   request: PurchaseRequest | null
   /** Diseño anterior, conservado cuando se empieza desde un ramo del catálogo sobre un diseño en curso. */
   previous: BouquetConfig | null
+  /** Cómo se llegó al configurador: solo explica el punto de partida (el origen real del ramo se deriva de config). */
+  entry: EntryMode
 
   setStep: (n: number) => void
   toggleFlower: (id: FlowerId) => void
@@ -34,10 +36,15 @@ interface CustomizerState {
   setCard: (patch: Partial<CardDraft>) => void
   setExtras: (patch: Partial<Extras>) => void
   reset: () => void
-  begin: (seed: BouquetConfig) => void
+  /**
+   * Empieza un diseño a partir de una semilla. `startStep` es solo un deseo: nunca supera el primer paso inválido
+   * de la semilla, así que no se puede aterrizar en un paso bloqueado por la validación secuencial.
+   */
+  begin: (seed: BouquetConfig, opts?: { startStep?: number; entry?: EntryMode }) => void
   restorePrevious: () => void
   dismissPrevious: () => void
   prepareRequest: () => PurchaseRequest
+  markContacted: (format: RequestFormat) => void
   markSent: () => void
 }
 
@@ -62,6 +69,7 @@ export const useCustomizerStore = create<CustomizerState>()(
         step: 0,
         request: null,
         previous: null,
+        entry: 'scratch',
 
         setStep: (n) => set({ step: clamp(Math.trunc(n), 0, STEPS.length - 1) }),
 
@@ -117,19 +125,24 @@ export const useCustomizerStore = create<CustomizerState>()(
         setCard: (patch) => edit((c) => ({ ...c, card: { ...c.card, ...patch } })),
         setExtras: (patch) => edit((c) => ({ ...c, extras: { ...c.extras, ...patch } })),
 
-        reset: () => set({ config: defaultConfig(), step: 0, request: null, previous: null }),
+        reset: () => set({ config: defaultConfig(), step: 0, request: null, previous: null, entry: 'scratch' }),
 
-        begin: (seed) =>
-          set((s) => ({
-            previous: isPristine(s.config) ? s.previous : s.config,
-            config: prune(seed),
-            step: 0,
-            request: null,
-          })),
+        begin: (seed, opts) =>
+          set((s) => {
+            const config = prune(seed)
+            const wanted = clamp(Math.trunc(opts?.startStep ?? 0), 0, STEPS.length - 1)
+            return {
+              previous: isPristine(s.config) ? s.previous : s.config,
+              config,
+              step: Math.min(wanted, firstInvalidStep(config)),
+              entry: opts?.entry ?? 'catalog-custom',
+              request: null,
+            }
+          }),
 
         restorePrevious: () => {
           const prev = get().previous
-          if (prev) set({ config: prev, previous: null, step: 0, request: null })
+          if (prev) set({ config: prev, previous: null, step: 0, request: null, entry: prev.baseProductId === null ? 'scratch' : 'catalog-custom' })
         },
         dismissPrevious: () => set({ previous: null }),
 
@@ -137,17 +150,21 @@ export const useCustomizerStore = create<CustomizerState>()(
           const { config } = get()
           const quote = computeQuote(config)
           const id = `ILA-${Date.now().toString(36).toUpperCase()}`
+          const createdAt = new Date().toISOString()
           const request: PurchaseRequest = {
             id,
-            createdAt: new Date().toISOString(),
+            createdAt,
             config,
             quote,
-            text: formatRequestText(config, quote, id),
+            text: formatRequestText(config, quote, id, createdAt),
             status: 'prepared',
           }
           set({ request })
           return request
         },
+
+        markContacted: (format) =>
+          set((s) => (s.request && s.request.status !== 'sent' ? { request: { ...s.request, status: 'contacted', format } } : s)),
 
         markSent: () => set((s) => (s.request ? { request: { ...s.request, status: 'sent' } } : s)),
       }
@@ -155,15 +172,19 @@ export const useCustomizerStore = create<CustomizerState>()(
     {
       name: 'ilatey-customizer',
       version: 1,
-      partialize: (s) => ({ config: s.config, step: s.step, request: s.request, previous: s.previous }),
+      partialize: (s) => ({ config: s.config, step: s.step, request: s.request, previous: s.previous, entry: s.entry }),
       merge: (persisted, current) => {
-        const p = (persisted ?? {}) as Partial<Pick<CustomizerState, 'config' | 'step' | 'request' | 'previous'>>
+        const p = (persisted ?? {}) as Partial<Pick<CustomizerState, 'config' | 'step' | 'request' | 'previous' | 'entry'>>
+        const config = normalizeConfig(p.config)
+        const entries: EntryMode[] = ['scratch', 'catalog-custom', 'catalog-direct']
         return {
           ...current,
-          config: normalizeConfig(p.config),
+          config,
           step: typeof p.step === 'number' ? clamp(p.step, 0, STEPS.length - 1) : 0,
           request: p.request ?? null,
           previous: p.previous ? normalizeConfig(p.previous) : null,
+          // Diseños guardados antes de existir `entry`: se deduce del producto de origen.
+          entry: p.entry && entries.includes(p.entry) ? p.entry : config.baseProductId === null ? 'scratch' : 'catalog-custom',
         }
       },
     },

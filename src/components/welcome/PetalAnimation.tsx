@@ -17,8 +17,8 @@ interface Petal {
  * Todo se anima con transform/opacity vía CSS (compuesto en GPU). Los valores salen de un generador con semilla:
  * son estables entre renders y no hay Math.random en el render.
  */
-function makePetals(count: number): Petal[] {
-  const rand = rng(20261105)
+function makePetals(count: number, seed: number, slow: number): Petal[] {
+  const rand = rng(seed)
   const range = (a: number, b: number) => a + rand() * (b - a)
   const list: Petal[] = []
   for (let i = 0; i < count; i++) {
@@ -43,6 +43,7 @@ function makePetals(count: number): Petal[] {
         x0 = range(0, 100); x1 = x0 + range(-8, 8); x2 = x1 + range(-8, 8)
     }
     // Escena 1: unos pocos pétalos nacen despacio. Escena 2: el resto se une al movimiento.
+    dur *= slow
     const delay = i < 5 ? range(0.2, 1.6) : range(1.4, 5.2)
     const style = {
       '--w': `${w.toFixed(1)}px`,
@@ -64,11 +65,19 @@ function makePetals(count: number): Petal[] {
   return list
 }
 
-export default function PetalAnimation() {
+type Props = {
+  /** Semilla de la disposición: otra semilla, otra coreografía (la bienvenida usa la predeterminada). */
+  seed?: number
+  /** Pétalos en escritorio; en pantallas pequeñas se reducen para cuidar el rendimiento. */
+  count?: number
+  /** Multiplicador de duración: > 1 = más lento y sereno. */
+  slow?: number
+}
+
+export default function PetalAnimation({ seed = 20261105, count: desktop = 26, slow = 1 }: Props) {
   const reduce = useReducedMotion()
-  // Menos pétalos en pantallas pequeñas para cuidar el rendimiento.
-  const count = typeof window !== 'undefined' && window.innerWidth < 640 ? 16 : 26
-  const petals = useMemo(() => makePetals(count), [count])
+  const count = typeof window !== 'undefined' && window.innerWidth < 640 ? Math.round(desktop * 0.62) : desktop
+  const petals = useMemo(() => makePetals(count, seed, slow), [count, seed, slow])
   if (reduce) return null
 
   return (
